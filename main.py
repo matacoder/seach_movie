@@ -54,6 +54,8 @@ def search_tv_show_by_name(term='Star Trek', display='human'):
             for title in r.json().get('results'):
                 where_to_watch = ', '.join([item.get('display_name') for item in title.get('locations')])
                 print(f"{title.get('name')}, available here: ({where_to_watch})")
+    else:
+        print('Attempt unsuccessful.')
 
 
 if __name__ == '__main__':
