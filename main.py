@@ -14,6 +14,13 @@ SERVER = os.getenv('SERVER')
 ENDPOINT = '/lookup'
 
 
+@dataclass
+class Movie:
+    locations: list
+    picture: str
+    name: str
+
+
 class RestClient:
     def __init__(self, server, endpoint, token):
         self.server = server
@@ -42,31 +49,36 @@ class RestClient:
     def search_term(self, term):
         response = self._get_response(term=term)
         if self._response_code_is_valid(response):
-            return response
+            return self._convert_to_movies(response)
+
+    @staticmethod
+    def _convert_to_movies(response):
+        results = response.json().get('results')
+        movies = []
+        if results:
+            for title in results:
+                movie = Movie(
+                    [item.get('display_name') for item in
+                     title.get('locations')],
+                    title.get('picture'),
+                    title.get('name'),
+                )
+                movies.append(movie)
+        return movies
 
 
-def search_tv_show_by_name(term='Star Trek', display='human'):
+def search_tv_show_by_name(term='Star Trek'):
     """
     Perform search in movie database.
 
     ARG 1 = search term
-    ARG 2 = display view (human or json)
     """
     client = RestClient(SERVER, ENDPOINT, TOKEN)
-    r = client.search_term(term)
-    if r is not None:
-        if display == 'json':
-            parsed = json.loads(r.text)
-            print(json.dumps(parsed, indent=4, sort_keys=True))
-        else:
-            for title in r.json().get('results'):
-                where_to_watch = ', '.join(
-                    [item.get('display_name') for item in
-                     title.get('locations')])
-                print(
-                    f"{title.get('name')}, available here: ({where_to_watch})")
-    else:
-        print('Attempt unsuccessful.')
+    movies = client.search_term(term)
+
+    for title in movies:
+        where_to_watch = ', '.join(title.locations)
+        print(f"{title.name}, available here: ({where_to_watch})")
 
 
 if __name__ == '__main__':
