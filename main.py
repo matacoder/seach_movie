@@ -30,7 +30,8 @@ def search_tv_show_by_name(term='Star Trek', display='human'):
         print(json.dumps(parsed, indent=4, sort_keys=True))
     else:
         for title in r.json().get('results'):
-            print(title['name'])
+            where_to_watch = ', '.join([item.get('display_name') for item in title.get('locations')])
+            print(f"{title.get('name')}, available here: ({where_to_watch})")
 
 
 if __name__ == '__main__':
