@@ -1,6 +1,6 @@
 import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import fire
 import requests
@@ -14,27 +14,35 @@ SERVER = os.getenv('SERVER')
 ENDPOINT = '/lookup'
 
 
-@dataclass
 class RestClient:
-    server: str
-    endpoint: str
-    token: str
+    def __init__(self, server, endpoint, token):
+        self.server = server
+        self.endpoint = endpoint
+        self.token = token
+        self.headers = self._get_headers()
 
-    def search_term(self, term):
-        headers = {
-            'X-AppKey': self.token,
-        }
-        params = {
-            'term': term,
-        }
+    def _get_headers(self):
+        return {'X-AppKey': self.token}
+
+    def _get_response(self, **params):
         try:
-            r = requests.get(self.server + self.endpoint, params=params, headers=headers)
-            if r.json().get('status_code') == 401:
-                print(f"{r.json().get('message')}")
-            else:
-                return r
+            response = requests.get(
+                self.server + self.endpoint,
+                params=params,
+                headers=self.headers
+            )
+            return response
         except RequestException as e:
             print(e)
+
+    @staticmethod
+    def _response_code_is_valid(response):
+        return response.json().get('status_code') == 200
+
+    def search_term(self, term):
+        response = self._get_response(term=term)
+        if self._response_code_is_valid(response):
+            return response
 
 
 def search_tv_show_by_name(term='Star Trek', display='human'):
@@ -52,8 +60,11 @@ def search_tv_show_by_name(term='Star Trek', display='human'):
             print(json.dumps(parsed, indent=4, sort_keys=True))
         else:
             for title in r.json().get('results'):
-                where_to_watch = ', '.join([item.get('display_name') for item in title.get('locations')])
-                print(f"{title.get('name')}, available here: ({where_to_watch})")
+                where_to_watch = ', '.join(
+                    [item.get('display_name') for item in
+                     title.get('locations')])
+                print(
+                    f"{title.get('name')}, available here: ({where_to_watch})")
     else:
         print('Attempt unsuccessful.')
 
