@@ -11,7 +11,13 @@ TOKEN = os.getenv('TOKEN')
 SERVER = os.getenv('SERVER')
 
 
-def search_tv_show_by_name(term='Star Trek'):
+def search_tv_show_by_name(term='Star Trek', display='human'):
+    """
+    Perform search in movie database.
+
+    ARG 1 = search term
+    ARG 2 = display view (human or json)
+    """
     headers = {
         'X-AppKey': TOKEN,
     }
@@ -19,8 +25,12 @@ def search_tv_show_by_name(term='Star Trek'):
         'term': term,
     }
     r = requests.get(SERVER + '/lookup', params=params, headers=headers)
-    parsed = json.loads(r.text)
-    print(json.dumps(parsed, indent=4, sort_keys=True))
+    if display == 'json':
+        parsed = json.loads(r.text)
+        print(json.dumps(parsed, indent=4, sort_keys=True))
+    else:
+        for title in r.json().get('results'):
+            print(title['name'])
 
 
 if __name__ == '__main__':
