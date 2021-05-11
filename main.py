@@ -4,6 +4,7 @@ import os
 import fire
 import requests
 from dotenv import load_dotenv
+from requests import RequestException
 
 load_dotenv()
 
@@ -35,7 +36,7 @@ def search_tv_show_by_name(term='Star Trek', display='human'):
             for title in r.json().get('results'):
                 where_to_watch = ', '.join([item.get('display_name') for item in title.get('locations')])
                 print(f"{title.get('name')}, available here: ({where_to_watch})")
-    except Exception as e:
+    except RequestException as e:
         print(e)
 
 
