@@ -1,8 +1,9 @@
 import json
 import os
 
-from dotenv import load_dotenv
+import fire
 import requests
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -10,7 +11,7 @@ TOKEN = os.getenv('TOKEN')
 SERVER = os.getenv('SERVER')
 
 
-def search_tv_show_by_name(term):
+def search_tv_show_by_name(term='Star Trek'):
     headers = {
         'X-AppKey': TOKEN,
     }
@@ -22,8 +23,5 @@ def search_tv_show_by_name(term):
     print(json.dumps(parsed, indent=4, sort_keys=True))
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    search_tv_show_by_name('Star Trek')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    fire.Fire(search_tv_show_by_name)
