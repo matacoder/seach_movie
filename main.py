@@ -1,6 +1,5 @@
-import json
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 import fire
 import requests
@@ -11,7 +10,6 @@ load_dotenv()
 
 TOKEN = os.getenv('TOKEN')
 SERVER = os.getenv('SERVER')
-ENDPOINT = '/lookup'
 
 
 @dataclass
@@ -73,7 +71,7 @@ def search_tv_show_by_name(term='Star Trek'):
 
     ARG 1 = search term
     """
-    client = RestClient(SERVER, ENDPOINT, TOKEN)
+    client = RestClient(server=SERVER, endpoint='/lookup', token=TOKEN)
     movies = client.search_term(term)
 
     for title in movies:
