@@ -50,19 +50,15 @@ class RestClient:
         except RequestException as e:
             logging.error(e)
 
-    @staticmethod
-    def _response_code_is_valid(response):
-        return response.json().get('status_code')
-
     def lookup_movies(self, term, endpoint='/lookup'):
         """Returns list of movies objects according search term."""
         response = self._get_response(endpoint, term=term)
         if response is not None:
-            status_code = self._response_code_is_valid(response)
-            if status_code == 200:
+            if response.status_code == 200:
                 return self._convert_to_movies_2(response)
             else:
-                logging.error(f'API status code is {status_code}')
+                logging.error(f'API status code is {response.status_code}\n'
+                              f'Server said: {response.reason}')
         else:
             logging.error(f'No response at all. Check server endpoint.')
 
@@ -70,7 +66,9 @@ class RestClient:
     def _convert_to_movies_2(response):
         """Keep movies as object to simplify properties lookup."""
         movies = []
+
         data = response.json().get('results')
+        print(response)
         if data:
             for item in data:
                 movies.append(Movie(**item))
