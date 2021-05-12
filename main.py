@@ -1,5 +1,7 @@
+import json
 import os
 from dataclasses import dataclass
+from types import SimpleNamespace
 
 import fire
 import requests
@@ -51,15 +53,14 @@ class RestClient:
 
     @staticmethod
     def _convert_to_movies(response):
-        results = response.json().get('results')
+        data = json.loads(response.text,
+                          object_hook=lambda d: SimpleNamespace(**d))
         movies = []
-        if results:
-            for title in results:
+        if data.results:
+            for title in data.results:
                 movie = Movie(
-                    [item.get('display_name') for item in
-                     title.get('locations')],
-                    title.get('picture'),
-                    title.get('name'),
+                    [item.display_name for item in title.locations],
+                    title.picture, title.name
                 )
                 movies.append(movie)
         return movies
