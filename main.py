@@ -64,9 +64,7 @@ class RestClient:
     def _convert_to_movies_2(response):
         """Keep movies as object to simplify properties lookup."""
         movies = []
-
         data = response.json().get('results')
-        print(response)
         if data:
             for item in data:
                 movies.append(
