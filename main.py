@@ -14,11 +14,12 @@ TOKEN = os.getenv('TOKEN')
 SERVER = os.getenv('SERVER')
 
 
-@dataclass
 class Movie:
-    locations: list
-    picture: str
-    name: str
+    """Movie object."""
+
+    def __init__(self, **kwargs):
+        """Accept all JSON fields."""
+        self.__dict__.update(kwargs)
 
 
 class RestClient:
@@ -59,8 +60,8 @@ class RestClient:
         if data.results:
             for title in data.results:
                 movie = Movie(
-                    [item.display_name for item in title.locations],
-                    title.picture, title.name
+                    locations=[item.display_name for item in title.locations],
+                    picture=title.picture, name=title.name
                 )
                 movies.append(movie)
         return movies
