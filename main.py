@@ -1,5 +1,7 @@
+import json
 import logging
 import os
+from types import SimpleNamespace
 
 import fire
 import requests
@@ -12,17 +14,13 @@ TOKEN = os.getenv('TOKEN')
 SERVER = os.getenv('SERVER')
 
 
-class Movie:
+class Movie(SimpleNamespace):
     """Movie object."""
-
-    def __init__(self, **kwargs):
-        """Accept all dict fields as properties."""
-        self.__dict__.update(kwargs)
 
     def get_locations(self):
         """Return comma separated string of Video Services."""
         return ', '.join(
-            [location['display_name'] for location in self.locations]
+            [location.display_name for location in self.locations]
         )
 
 
@@ -71,7 +69,10 @@ class RestClient:
         print(response)
         if data:
             for item in data:
-                movies.append(Movie(**item))
+                movies.append(
+                    json.loads(json.dumps(item),
+                               object_hook=lambda d: Movie(**d))
+                )
         else:
             logging.info('Response has no "results" section.')
         return movies
@@ -94,4 +95,5 @@ def search_tv_show_by_name(term='Star Trek'):
 
 
 if __name__ == '__main__':
+    # Using Google Fire to create simple CLI
     fire.Fire(search_tv_show_by_name)
