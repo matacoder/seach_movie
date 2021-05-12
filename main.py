@@ -24,6 +24,7 @@ class Movie:
 
 class RestClient:
     """Connect to server with token."""
+
     def __init__(self, server, token):
         self.server = server
         self.token = token
@@ -53,20 +54,14 @@ class RestClient:
         response = self._get_response(endpoint, term=term)
         if response is not None:
             if self._response_code_is_valid(response):
-                return self._convert_to_movies(response)
+                return self._convert_to_movies_2(response)
 
     @staticmethod
-    def _convert_to_movies(response):
-        data = json.loads(response.text,
-                          object_hook=lambda d: SimpleNamespace(**d))
+    def _convert_to_movies_2(response):
         movies = []
-        if data.results:
-            for title in data.results:
-                movie = Movie(
-                    locations=[item.display_name for item in title.locations],
-                    picture=title.picture, name=title.name
-                )
-                movies.append(movie)
+        data = response.json()['results']
+        for item in data:
+            movies.append(Movie(**item))
         return movies
 
 
@@ -80,7 +75,9 @@ def search_tv_show_by_name(term='Star Trek'):
     movies = client.lookup_movie(term, endpoint='/lookup')
 
     for title in movies:
-        where_to_watch = ', '.join(title.locations)
+        where_to_watch = ', '.join(
+            list(map(lambda x: x['display_name'], title.locations))
+        )
         print(f"{title.name}, available here: ({where_to_watch})")
 
 
