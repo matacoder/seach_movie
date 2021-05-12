@@ -1,7 +1,4 @@
-import json
 import os
-from dataclasses import dataclass
-from types import SimpleNamespace
 
 import fire
 import requests
@@ -18,7 +15,7 @@ class Movie:
     """Movie object."""
 
     def __init__(self, **kwargs):
-        """Accept all JSON fields."""
+        """Accept all dict fields as properties."""
         self.__dict__.update(kwargs)
 
 
@@ -50,7 +47,8 @@ class RestClient:
     def _response_code_is_valid(response):
         return response.json().get('status_code') == 200
 
-    def lookup_movie(self, term, endpoint='/lookup'):
+    def lookup_movies(self, term, endpoint='/lookup'):
+        """Returns list of movies objects according search term."""
         response = self._get_response(endpoint, term=term)
         if response is not None:
             if self._response_code_is_valid(response):
@@ -58,6 +56,7 @@ class RestClient:
 
     @staticmethod
     def _convert_to_movies_2(response):
+        """Keep movies as object to simplify properties lookup."""
         movies = []
         data = response.json()['results']
         for item in data:
@@ -72,7 +71,7 @@ def search_tv_show_by_name(term='Star Trek'):
     ARG 1 = search term
     """
     client = RestClient(server=SERVER, token=TOKEN)
-    movies = client.lookup_movie(term, endpoint='/lookup')
+    movies = client.lookup_movies(term, endpoint='/lookup')
     if movies is not None:
         for title in movies:
             where_to_watch = ', '.join(
