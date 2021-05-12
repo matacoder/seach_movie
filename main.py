@@ -86,10 +86,9 @@ def search_tv_show_by_name(term='Star Trek'):
     movies = client.lookup_movies(term, endpoint='/lookup')
     if movies:
         for title in movies:
-            print(
-                f"{title.name}, available here: {title.get_locations()}")
+            yield f"{title.name}, available here: {title.get_locations()}"
     else:
-        print("No results found.")
+        yield "No results found."
 
 
 if __name__ == '__main__':
