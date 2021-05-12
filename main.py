@@ -23,15 +23,18 @@ class Movie:
 
 
 class RestClient:
+    """Connect to server with token."""
     def __init__(self, server, token):
         self.server = server
         self.token = token
         self.headers = self._get_headers()
 
     def _get_headers(self):
+        """Build headers for authentication."""
         return {'X-AppKey': self.token}
 
     def _get_response(self, endpoint, **params):
+        """Get response object from custom endpoint."""
         try:
             response = requests.get(
                 self.server + endpoint,
@@ -48,8 +51,9 @@ class RestClient:
 
     def lookup_movie(self, term, endpoint='/lookup'):
         response = self._get_response(endpoint, term=term)
-        if self._response_code_is_valid(response):
-            return self._convert_to_movies(response)
+        if response is not None:
+            if self._response_code_is_valid(response):
+                return self._convert_to_movies(response)
 
     @staticmethod
     def _convert_to_movies(response):
