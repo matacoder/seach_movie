@@ -23,19 +23,18 @@ class Movie:
 
 
 class RestClient:
-    def __init__(self, server, endpoint, token):
+    def __init__(self, server, token):
         self.server = server
-        self.endpoint = endpoint
         self.token = token
         self.headers = self._get_headers()
 
     def _get_headers(self):
         return {'X-AppKey': self.token}
 
-    def _get_response(self, **params):
+    def _get_response(self, endpoint, **params):
         try:
             response = requests.get(
-                self.server + self.endpoint,
+                self.server + endpoint,
                 params=params,
                 headers=self.headers
             )
@@ -47,8 +46,8 @@ class RestClient:
     def _response_code_is_valid(response):
         return response.json().get('status_code') == 200
 
-    def search_term(self, term):
-        response = self._get_response(term=term)
+    def lookup_movie(self, term, endpoint='/lookup'):
+        response = self._get_response(endpoint, term=term)
         if self._response_code_is_valid(response):
             return self._convert_to_movies(response)
 
@@ -73,8 +72,8 @@ def search_tv_show_by_name(term='Star Trek'):
 
     ARG 1 = search term
     """
-    client = RestClient(server=SERVER, endpoint='/lookup', token=TOKEN)
-    movies = client.search_term(term)
+    client = RestClient(server=SERVER, token=TOKEN)
+    movies = client.lookup_movie(term, endpoint='/lookup')
 
     for title in movies:
         where_to_watch = ', '.join(title.locations)
