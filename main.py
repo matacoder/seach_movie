@@ -73,12 +73,15 @@ def search_tv_show_by_name(term='Star Trek'):
     """
     client = RestClient(server=SERVER, token=TOKEN)
     movies = client.lookup_movie(term, endpoint='/lookup')
-
-    for title in movies:
-        where_to_watch = ', '.join(
-            list(map(lambda x: x['display_name'], title.locations))
-        )
-        print(f"{title.name}, available here: ({where_to_watch})")
+    if movies is not None:
+        for title in movies:
+            where_to_watch = ', '.join(
+                list(map(lambda x: x['display_name'], title.locations))
+            )
+            print(f"{title.name}, available here: ({where_to_watch})")
+    else:
+        print("Something went wrong, can't get movies. "
+              "Check API token and endpoint")
 
 
 if __name__ == '__main__':
