@@ -1,6 +1,6 @@
 import unittest
 
-from main import RestClient, search_tv_show_by_name
+from main import RestClient
 
 
 class MockResponse:
