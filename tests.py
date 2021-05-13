@@ -56,9 +56,15 @@ class MockRestClient(RestClient):
             'term': 'Star Trek: Generations', 'status_code': 200,
             'variant': 'ivafull'
         }
+        text_no_results = {
+            'results': [], 'updated': '2021-05-08T14:07:37+0100',
+            'term': 'ThatMovieDoesNotExist', 'status_code': 200,
+            'variant': 'ivafull'
+        }
         status_code = 200
         response = MockResponse(text, status_code)
-        return response if params['term'] == 'Star Trek: Generations' else None
+        no_found_response = MockResponse(text_no_results, status_code)
+        return response if params['term'] == 'Star Trek: Generations' else no_found_response
 
 
 class TestAPI(unittest.TestCase):
@@ -73,7 +79,8 @@ class TestAPI(unittest.TestCase):
         term = 'ThatMovieDoesNotExist'
         client = MockRestClient('https://mock', 'mock_token')
         movies = client.lookup_movies(term, endpoint='/lookup')
-        self.assertEqual(movies, None)
+        self.assertEqual(len(movies), 0)
+        self.assertEqual(movies, [])
 
 
 if __name__ == '__main__':
