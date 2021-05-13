@@ -23,6 +23,10 @@ class Movie(SimpleNamespace):
             [location.display_name for location in self.locations]
         )
 
+    @property
+    def movie_name(self):
+        return self.name
+
 
 class RestClient:
     """Connect to server with token."""
@@ -86,7 +90,7 @@ def search_tv_show_by_name(term='Star Trek'):
     movies = client.lookup_movies(term, endpoint='/lookup')
     if movies:
         for title in movies:
-            yield f"{title.name}, available here: {title.get_locations()}"
+            yield f"{title.movie_name}, available here: {title.get_locations()}"
     else:
         yield "No results found."
 
